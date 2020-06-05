@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>登录</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="all,follow">
+    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.2.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="__STATIC__/bootstrap/css/style.default.css" id="theme-stylesheet">
+</head>
+<body>
+<div class="page login-page">
+    <div class="container d-flex align-items-center">
+        <div class="form-holder has-shadow">
+            <div class="row">
+                <!-- Logo & Information Panel-->
+                <div class="col-lg-6">
+                    <div class="info d-flex align-items-center">
+                        <div class="content">
+                            <div class="logo">
+                                <h1>欢迎登录</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Form Panel    -->
+                <div class="col-lg-6 bg-white">
+                    <div class="form d-flex align-items-center">
+                        <div class="content">
+                                <div class="form-group">
+                                    <input id="login-username" type="text" name="userName" required data-msg="请输入用户名" placeholder="用户名" value="admin" class="input-material">
+                                </div>
+                                <div class="form-group">
+                                    <input id="login-password" type="password" name="passWord" required data-msg="请输入密码" placeholder="密码" class="input-material">
+                                </div>
+                                <button id="login" type="submit" class="btn btn-primary">登录</button>
+                            <br />
+                            <small>没有账号?</small><a href="register.html" class="signup">&nbsp;注册</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- JavaScript files-->
+<script src="https://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    $(function(){
+        /*登录*/
+        $("#login").click(function(){
+            var userName=$("#login-username").val();
+            var passWord=$("#login-password").val();
+            console.log(userName + passWord);
+            $.ajax({
+                url: "{:url('/login')}",
+                type: 'post',
+                data: {
+                    name: userName,
+                    passWord: passWord
+                },
+                success: function (res) {
+                    if (res.status == 0){
+                        location="/chat/"+res.data.token;
+                    } else {
+                        alert(res.msg);
+                    }
+                },
+                error:function() {
+
+                }
+            });
+        })
+    })
+</script>
+</body>
+</html>

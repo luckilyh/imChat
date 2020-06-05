@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>首页</title>
+    <link rel="stylesheet" href="__STATIC__/layIM-master/dist/css/layui.css" media="all">
+</head>
+<body>
+<script src="https://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="__STATIC__/layIM-master/dist/layui.js"></script>
+<script>
+    layui.use('layim', function(layim){
+        ws = new WebSocket("ws://101.132.40.5:2348?token={$token}");
+        //基础配置
+        layim.config({
+            init: {
+                url: "/getFriend/{$token}" //接口地址（返回的数据格式见下文）
+                ,type: 'get' //默认get，一般可不填
+                ,data: {} //额外参数
+            } //获取主面板列表信息，下文会做进一步介绍
+            ,isgroup: false
+            ,copyright: true
+            //上传图片接口（返回的数据格式见下文），若不开启图片上传，剔除该项即可
+            ,uploadImage: {
+                url: '/uploadImage/{$token}' //接口地址
+                ,type: 'post' //默认post
+            }
+            //,msgbox: layui.cache.dir + 'css/modules/layim/html/msgbox.html' //消息盒子页面地址，若不开启，剔除该项即可
+            //,find: layui.cache.dir + 'css/modules/layim/html/find.html' //发现页面地址，若不开启，剔除该项即可
+            ,chatLog: '/chatlog?token={$token}' //聊天记录页面地址，若不开启，剔除该项即可
+        });
+
+        layim.on('sendMessage', function(res){
+            ws.send(JSON.stringify({
+                type: 'textMessage' //随便定义，用于在服务端区分消息类型
+                ,data: res
+            }));
+        });
+        ws.onmessage = function(res){
+            data = JSON.parse(res.data);
+            console.log(data);
+            if (data.type == "friend") {
+                layim.getMessage(data);
+            }
+        };
+        layim.on('sign', function(value){
+            $.ajax({
+                url: "{:url('/updateSign')}",
+                type: 'post',
+                data: {
+                    sign: value,
+                    token: "{$token}"
+                },
+                success: function (res) {
+
+                },
+                error:function() {
+
+                }
+            });
+        });
+
+        layim.on('online', function(status){
+            $.ajax({
+                url: "{:url('/updateOnline')}",
+                type: 'post',
+                data: {
+                    status: status,
+                    token: "{$token}"
+                },
+                success: function (res) {
+
+                },
+                error:function() {
+
+                }
+            });
+            //此时，你就可以通过Ajax将这个状态值记录到数据库中了。
+            //服务端接口需自写。
+        });
+
+        layim.on('setSkin', function(filename, src){
+            console.log(filename); //获得文件名，如：1.jpg
+            console.log(src); //获得背景路径，如：http://res.layui.com/layui/src/css/modules/layim/skin/1.jpg
+        });
+    });
+</script>
+</body>
+</html>
